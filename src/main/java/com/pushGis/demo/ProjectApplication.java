@@ -1,5 +1,6 @@
 package com.pushGis.demo;
 
+import model.DownloadUtilies;
 import model.Shp2Pgsql;
 
 import java.io.File;
@@ -39,52 +40,11 @@ public class ProjectApplication {
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:mma_reservas_marinas_ddw84&outputFormat=SHAPE-ZIP", 
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_riesgo_tsunami_ddw84&outputFormat=SHAPE-ZIP"};
 			String[] servicesNames = {"gore_caletas_pesqueras_ddw84.zip", "gore_faenas_minerasactivas_ddw84.zip", "mma_reservas_marinas_ddw84.zip", "gore_riesgo_tsunami_ddw84.zip"};
-			String carpetaActual = System.getProperty("user.dir");
-			String carpetaShapefiles = carpetaActual.replace("\\","/") + "/shapefiles/";
-			
-			
-			
-			carpetaShapefiles = carpetaShapefiles.substring(1, carpetaShapefiles.length());
-			carpetaShapefiles = carpetaShapefiles.substring(1, carpetaShapefiles.length());
-			
-			//Creacion de carpeta shapefiles en caso de que no exista
-			File dir = new File(carpetaShapefiles);
-			if (!dir.exists())
-				  if (!dir.mkdir())
-					  System.out.println("Error al crear la carpeta shapefiles **"); // no se pudo crear la carpeta de destino
-			System.out.println("Se crea la carpeta con éxito");
-			
-			//Se descargan las capas con servicios WFS
-			File file;
-			URLConnection conn;
-			InputStream in;
-			OutputStream out;
-			int i, j;
-			for(i = 0; i < urlList.length ; i++)
-			{	
-				try {
-					file = new File(carpetaShapefiles + servicesNames[i]);
-					conn = new URL(urlList[i]).openConnection();
-					conn.connect();
-					in = conn.getInputStream();
-					out = new FileOutputStream(file);
-					
-					int b = 0;
-					while (b != -1) {
-					  b = in.read();
-					  if (b != -1)
-					    out.write(b);
-					}
-					out.close();
-					in.close();
-				} catch (MalformedURLException e) {
-					  System.out.println("la url: " + urlList[i] + " no es valida!");
-					} catch (IOException e) {
-					  e.printStackTrace();
-					}
-			}
-			
-			
+
+			DownloadUtilies downloadUtilies = new DownloadUtilies(urlList,servicesNames);
+			downloadUtilies.createFolder();
+			downloadUtilies.downloadLayers();
+
 			
 			/*
 			String urlFinal;
