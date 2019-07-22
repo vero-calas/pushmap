@@ -20,11 +20,11 @@ public class Shp2Pgsql {
 
     private DataStore dataStore;
 
-    public void loadData(){
+    public void loadData(String url){
 
         try {
             //Apertura del shapefile
-            File shp = new File("/home/shalini/Escritorio/archivos_prueba_TP/Comuna.shp");
+            File shp = new File(url);
             DataStore inputDataStore = DataStoreFinder.getDataStore(Collections.singletonMap("url",shp.toURI().toURL()));
             String fileName = inputDataStore.getTypeNames()[0];
             SimpleFeatureType inputType = inputDataStore.getSchema(fileName);

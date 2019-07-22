@@ -25,15 +25,19 @@ public class ProjectApplication {
 			Shp2Pgsql shape2db = new Shp2Pgsql();
 
 
-			String[] urlList = {"Cheese", "Pepperoni", "Black Olives"};
+			String[] urlList = {"gore_caletas_pesqueras_ddw84.shp", "gore_faenas_minerasactivas_ddw84.shp", "gore_riesgo_tsunami_ddw84.shp", "mma_reservas_marinas_ddw84.shp"};
 			String carpetaActual = System.getProperty("user.dir");
-
-
+			String carpetaShapefiles = carpetaActual.replace("\\","/") + "shapefiles/";
+			carpetaShapefiles = carpetaShapefiles.substring(1, carpetaShapefiles.length());
+			carpetaShapefiles = carpetaShapefiles.substring(1, carpetaShapefiles.length());
+			String urlFinal;
 			for(int i = 0; i < urlList.length ; i++)
 			{
-				//shape2db.loadData(urlList[i]);
+				urlFinal = carpetaShapefiles + urlList[i];
+				System.out.println(urlFinal);
+				//shape2db.loadData(urlFinal);
 			}
-			shape2db.loadData();
+			//shape2db.loadData();
         } catch (Exception e) {
             e.printStackTrace();
         }
