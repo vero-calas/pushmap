@@ -23,6 +23,16 @@ public class ProjectApplication {
         try {
             //Csv2Shape.createShape();
 			Shp2Pgsql shape2db = new Shp2Pgsql();
+
+
+			String[] urlList = {"Cheese", "Pepperoni", "Black Olives"};
+			String carpetaActual = System.getProperty("user.dir");
+
+
+			for(int i = 0; i < urlList.length ; i++)
+			{
+				//shape2db.loadData(urlList[i]);
+			}
 			shape2db.loadData();
         } catch (Exception e) {
             e.printStackTrace();

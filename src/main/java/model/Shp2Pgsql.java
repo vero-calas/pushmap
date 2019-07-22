@@ -33,7 +33,6 @@ public class Shp2Pgsql {
 
             //Conexión con la base de datos
             Map<String, Object> params = new HashMap<>();
-            //Properties params = new Properties();
             params.put("dbtype", "postgis");
             params.put("host", "127.0.0.1");
             params.put("port", 5432);
@@ -99,9 +98,15 @@ public class Shp2Pgsql {
                 if(schemaName.equalsIgnoreCase(name))
                     created = true;
             }
-            if(!created)
+            if(!created){
                 //Se crea el schema, en caso de que no exista en la bd
                 dataStore.createSchema(schema);
+            }
+            else {
+                dataStore.removeSchema(schema.getTypeName());
+                dataStore.createSchema(schema);
+                System.out.println("Ya esta creado pero se creo de nuevo");
+            }
 
             //Proceso de escritura de features
             SimpleFeatureSource featureSource = dataStore.getFeatureSource(schemaName);
@@ -113,6 +118,7 @@ public class Shp2Pgsql {
                     //Se agregan todas las features a la base de datos
                     List<FeatureId> listaIDs = featureStore.addFeatures(features);
                     transaction.commit();
+                    System.out.println("Realiza la escritura en la base de datos");
                 }catch(Exception ex){
                     //Si no se logra, se realiza un rollback
                     ex.printStackTrace();
