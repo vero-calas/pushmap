@@ -67,6 +67,12 @@ public class Csv2Shape {
                     o[i] = split[i-1];
                 }
                 o[0] = factory.createPoint(new Coordinate(longitude, latitude));
+                System.out.println(o[0]);
+                System.out.println(o[1]);
+                System.out.println(o[2]);
+                System.out.println(o[3]);
+                System.out.println(o[4]);
+                System.out.println();
                 //SimpleFeature feature = SimpleFeatureBuilder.build(TYPE, o, null);
                 SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(TYPE);
                 featureBuilder.add(o);
