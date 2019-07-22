@@ -1,5 +1,5 @@
 package model;
- 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,13 +28,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.scheduling.annotation.Scheduled;
 
 
 public class Csv2Shape {
- 
+
     public static void createShape() throws Exception {
         //Apertura del fichero
-        File file = new File("/home/shalini/Escritorio/locations.csv");
+        File file = new File("C:/Users/veron/Desktop/locations.csv");
 
         //Se crea un listado de features a partir de la lectura del archivo
         List<SimpleFeature> features = new ArrayList<>();
@@ -42,21 +43,21 @@ public class Csv2Shape {
         SimpleFeatureType TYPE = null;
         try {
             String line = reader.readLine();
-             
+
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("location:Point,");
- 
+
             String[] headers = line.split("\\,");
             for (String header : headers) {
                 stringBuilder.append("").append(header).append(":String,");
             }
- 
+
             TYPE = DataUtilities.createType("Location", stringBuilder.substring(0, stringBuilder.toString().length() - 1));
             GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
- 
+
             for (line = reader.readLine(); line != null; line = reader.readLine()) {
                 String split[] = line.split("\\,");
- 
+
 
                 double latitude = Double.parseDouble(split[0]);
                 double longitude = Double.parseDouble(split[1]);
@@ -81,25 +82,25 @@ public class Csv2Shape {
         } finally {
             reader.close();
         }
-        File newFile = new File("/home/shalini/Escritorio/inflasi4.shp");
- 
+        File newFile = new File("C:/Users/veron/Desktop/resultados.shp");
+
         DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
- 
+
         Map<String, Serializable> create = new HashMap<String, Serializable>();
         create.put("url", newFile.toURI().toURL());
         create.put("create spatial index", Boolean.TRUE);
- 
+
         ShapefileDataStore newDataStore = (ShapefileDataStore) factory.createNewDataStore(create);
         newDataStore.createSchema(TYPE);
         newDataStore.forceSchemaCRS(DefaultGeographicCRS.WGS84);
- 
+
         Transaction transaction = new DefaultTransaction("create");
- 
+
         String typeName = newDataStore.getTypeNames()[0];
         FeatureStore<SimpleFeatureType, SimpleFeature> featureStore;
         SimpleFeatureCollection collection = new ListFeatureCollection(TYPE, features);
         featureStore = (FeatureStore<SimpleFeatureType, SimpleFeature>) newDataStore.getFeatureSource(typeName);
- 
+
         featureStore.setTransaction(transaction);
         try {
             featureStore.addFeatures(collection);
@@ -111,4 +112,5 @@ public class Csv2Shape {
             transaction.close();
         }
     }
+
 }
