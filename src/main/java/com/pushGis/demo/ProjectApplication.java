@@ -1,5 +1,6 @@
 package com.pushGis.demo;
 
+import model.Shp2Pgsql;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,7 +21,9 @@ public class ProjectApplication {
 	public void scheduleFixedDelayTask() {
 
         try {
-            Csv2Shape.createShape();
+            //Csv2Shape.createShape();
+			Shp2Pgsql shape2db = new Shp2Pgsql();
+			shape2db.loadData();
         } catch (Exception e) {
             e.printStackTrace();
         }

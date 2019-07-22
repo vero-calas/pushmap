@@ -35,7 +35,7 @@ public class Csv2Shape {
 
     public static void createShape() throws Exception {
         //Apertura del fichero
-        File file = new File("C:/Users/veron/Desktop/locations.csv");
+        File file = new File("/home/shalini/Escritorio/locations.csv");
 
         //Se crea un listado de features a partir de la lectura del archivo
         List<SimpleFeature> features = new ArrayList<>();
@@ -67,12 +67,6 @@ public class Csv2Shape {
                     o[i] = split[i-1];
                 }
                 o[0] = factory.createPoint(new Coordinate(longitude, latitude));
-                System.out.println(o[0]);
-                System.out.println(o[1]);
-                System.out.println(o[2]);
-                System.out.println(o[3]);
-                System.out.println(o[4]);
-                System.out.println();
                 //SimpleFeature feature = SimpleFeatureBuilder.build(TYPE, o, null);
                 SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(TYPE);
                 featureBuilder.add(o);
@@ -82,7 +76,7 @@ public class Csv2Shape {
         } finally {
             reader.close();
         }
-        File newFile = new File("C:/Users/veron/Desktop/resultados.shp");
+        File newFile = new File("/home/shalini/Escritorio/resultados.shp");
 
         DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 
