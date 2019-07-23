@@ -1,5 +1,7 @@
 package model;
 
+import configuration.GeoServerProperties;
+import configuration.SQLProperties;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
@@ -35,13 +37,13 @@ public class Shp2Pgsql {
 
             //Conexión con la base de datos
             Map<String, Object> params = new HashMap<>();
-            params.put("dbtype", "postgis");
-            params.put("host", "127.0.0.1");
-            params.put("port", 5432);
-            params.put("schema", "public");
-            params.put("database", "postgres");
-            params.put("user", "postgres");
-            params.put("passwd", "secret");
+            params.put("dbtype",SQLProperties.DB_TYPE);
+            params.put("host", SQLProperties.DB_HOST);
+            params.put("port", SQLProperties.DB_PORT);
+            params.put("schema", SQLProperties.DB_SCHEMA);
+            params.put("database", SQLProperties.DB_NAME);
+            params.put("user", SQLProperties.DB_USER);
+            params.put("passwd", SQLProperties.DB_PASS);
             this.dataStore = DataStoreFinder.getDataStore(params);
 
             //Generación de estructura para almacenar Features en la bd
