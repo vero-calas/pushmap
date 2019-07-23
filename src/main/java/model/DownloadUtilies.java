@@ -118,4 +118,20 @@ public class DownloadUtilies {
             }
         }
     }
+
+    public String[] getUrlList() {
+        return urlList;
+    }
+
+    public String[] getZipFilesNames() {
+        return zipFilesNames;
+    }
+
+    public String getCarpetaActual() {
+        return carpetaActual;
+    }
+
+    public String getCarpetaShapefiles() {
+        return carpetaShapefiles;
+    }
 }

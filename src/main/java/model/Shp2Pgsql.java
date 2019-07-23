@@ -1,5 +1,9 @@
 package model;
 
+import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
+import it.geosolutions.geoserver.rest.GeoServerRESTReader;
+import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
+import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 import org.geotools.data.*;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -41,9 +45,6 @@ public class Shp2Pgsql {
             params.put("user", "postgres");
             params.put("passwd", "secret");
             this.dataStore = DataStoreFinder.getDataStore(params);
-            System.out.println("PRUEBA");
-            System.out.println(dataStore);
-
 
             //Generación de estructura para almacenar Features en la bd
             FeatureCollection<SimpleFeatureType,SimpleFeature> data = readData(inputFeatureCollection);
@@ -52,7 +53,12 @@ public class Shp2Pgsql {
             writeData(data);
 
             //Publicacion en geoserver(?)
-
+            System.out.println("Publicación en geoserver...en proceso");
+            boolean ok = publishLayer("resultados","PushMap","pushmap");
+            if(ok)
+                System.out.println("PUBLICADO");
+            else
+                System.out.println("NO PUBLICADO");
             //Finalizar conexión con base de datos
             this.dataStore.dispose();
             inputDataStore.dispose();
@@ -61,6 +67,37 @@ public class Shp2Pgsql {
             e.printStackTrace();
         }
     }
+
+    public boolean publishLayer(String name, String workspace, String dataStore){
+
+        boolean published = false;
+        String json = "{\"featureType\": {\"name\": \""+name+"\"}}";
+        String url = "http://localhost:8080/geoserver/rest/workspaces/"+workspace+"/datastores/"+workspace+"/featuretypes";
+
+        String restURL = "http://localhost:8080/geoserver";
+        String username = "admin";
+        String password = "geoserver";
+
+        try{
+            GeoServerRESTReader reader = new GeoServerRESTReader(restURL,username,password);
+            GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(restURL,username,password);
+
+            GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
+            fte.setName(name);
+            fte.setTitle(name);
+            fte.setSRS("EPSG:4326");
+
+            GSLayerEncoder layerEncoder = new GSLayerEncoder();
+            layerEncoder.setDefaultStyle("point");
+
+            published = publisher.publishDBLayer(workspace,dataStore,fte,layerEncoder);
+            return published;
+        }catch (MalformedURLException m){
+            m.printStackTrace();
+            return published;
+        }
+    }
+
     public FeatureCollection<SimpleFeatureType, SimpleFeature> readData(FeatureCollection<SimpleFeatureType, SimpleFeature> inputFeatureCollection){
         ArrayList<SimpleFeature> list = new ArrayList<>();
         SimpleFeature temp;
