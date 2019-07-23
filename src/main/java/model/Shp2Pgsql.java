@@ -5,7 +5,6 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 import org.geotools.data.*;
-import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -13,7 +12,6 @@ import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.identity.FeatureId;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +51,8 @@ public class Shp2Pgsql {
             writeData(data);
 
             //Publicacion en geoserver(?)
+            //Ver si ya está publicado o no
+
             System.out.println("Publicación en geoserver...en proceso");
             boolean ok = publishLayer("resultados","PushMap","pushmap");
             if(ok)
@@ -71,10 +71,8 @@ public class Shp2Pgsql {
     public boolean publishLayer(String name, String workspace, String dataStore){
 
         boolean published = false;
-        String json = "{\"featureType\": {\"name\": \""+name+"\"}}";
-        String url = "http://localhost:8080/geoserver/rest/workspaces/"+workspace+"/datastores/"+workspace+"/featuretypes";
 
-        String restURL = "http://localhost:8080/geoserver";
+        String restURL = "http://localhost:8080/geoserver/";
         String username = "admin";
         String password = "geoserver";
 
@@ -82,16 +80,23 @@ public class Shp2Pgsql {
             GeoServerRESTReader reader = new GeoServerRESTReader(restURL,username,password);
             GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(restURL,username,password);
 
-            GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
-            fte.setName(name);
-            fte.setTitle(name);
-            fte.setSRS("EPSG:4326");
+            if(reader.existsLayer(workspace,name,true)){
+                System.out.println("Ya esta publicado!");
+                return published;
+            }else{
+                System.out.println("NO está publicado");
+                System.out.println();
+                GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
+                fte.setName(name);
+                fte.setTitle(name);
+                fte.setSRS("EPSG:4326");
 
-            GSLayerEncoder layerEncoder = new GSLayerEncoder();
-            layerEncoder.setDefaultStyle("point");
+                GSLayerEncoder layerEncoder = new GSLayerEncoder();
+                layerEncoder.setDefaultStyle("point");
 
-            published = publisher.publishDBLayer(workspace,dataStore,fte,layerEncoder);
-            return published;
+                published = publisher.publishDBLayer(workspace,dataStore,fte,layerEncoder);
+                return published;
+            }
         }catch (MalformedURLException m){
             m.printStackTrace();
             return published;
