@@ -35,11 +35,11 @@ public class ProjectApplication {
 
             //--------------------------------------------------------------------------
             //Convertir de csv a shapefile
-            //Csv2Shape.createShape();
+            Csv2Shape.createShape();
 
 			//--------------------------------------------------------------------------
             //Descarga de archivos por WFS
-			String[] urlList = {"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_caletas_pesqueras_ddw84&maxFeatures=50&outputFormat=SHAPE-ZIP",
+			/*String[] urlList = {"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_caletas_pesqueras_ddw84&maxFeatures=50&outputFormat=SHAPE-ZIP",
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_faenas_minerasactivas_ddw84&outputFormat=SHAPE-ZIP", 
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:mma_reservas_marinas_ddw84&outputFormat=SHAPE-ZIP", 
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_riesgo_tsunami_ddw84&outputFormat=SHAPE-ZIP"};
@@ -48,7 +48,7 @@ public class ProjectApplication {
 			DownloadUtilies downloadUtilies = new DownloadUtilies(urlList,servicesNames);
 			downloadUtilies.createFolder();
 			downloadUtilies.downloadLayers();
-			downloadUtilies.decompressZips();
+			downloadUtilies.decompressZips();*/
 
             //--------------------------------------------------------------------------
             //Subida de shapefile a postgis
@@ -59,8 +59,11 @@ public class ProjectApplication {
 				urlFinal = carpetaShapefiles + urlList[i];
 				System.out.println(urlFinal);
 				//shape2db.loadData(urlFinal);
-			}
-			//shape2db.loadData(); */
+			}*/
+            System.out.println("loadData");
+			Shp2Pgsql shape2db = new Shp2Pgsql();
+			shape2db.loadData("/home/shalini/Escritorio/resultados.shp");
+
 
         } catch (Exception e) {
             e.printStackTrace();
