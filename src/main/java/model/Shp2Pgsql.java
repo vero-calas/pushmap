@@ -54,13 +54,15 @@ public class Shp2Pgsql {
 
             //Publicacion en geoserver(?)
             //Ver si ya está publicado o no
-
+            
+            /*
             System.out.println("Publicación en geoserver...en proceso");
             boolean ok = publishLayer("resultados","PushMap","pushmap");
             if(ok)
                 System.out.println("PUBLICADO");
             else
                 System.out.println("NO PUBLICADO");
+                */
             //Finalizar conexión con base de datos
             this.dataStore.dispose();
             inputDataStore.dispose();

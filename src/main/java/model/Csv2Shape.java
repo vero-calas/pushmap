@@ -32,7 +32,11 @@ public class Csv2Shape {
 
     public static void createShape() throws Exception {
         //Apertura del fichero
-        File file = new File("/home/shalini/Escritorio/resultados.csv");
+    	String carpetaActual = System.getProperty("user.dir");
+    	carpetaActual = carpetaActual.replace("\\","/");
+        String carpetaShapefiles = carpetaActual + "/shapefiles/";
+        System.out.println(carpetaActual + "/voluntarios.csv");
+        File file = new File(carpetaActual + "/voluntarios.csv");
 
         //Se crea un listado de features a partir de la lectura del archivo
         List<SimpleFeature> features = new ArrayList<>();
@@ -80,7 +84,7 @@ public class Csv2Shape {
         } finally {
             reader.close();
         }
-        File newFile = new File("/home/shalini/Escritorio/resultados.shp");
+        File newFile = new File(carpetaShapefiles + "resultados.shp");
 
         DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 
