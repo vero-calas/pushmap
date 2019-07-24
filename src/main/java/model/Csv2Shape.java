@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataUtilities;
@@ -29,10 +30,10 @@ import org.locationtech.jts.geom.Coordinate;
 
 
 public class Csv2Shape {
+	private static final Logger logr = Logger.getLogger("PushMap");
 
     public static void createShape(String carpetaActual, String carpetaShapefiles, String archivoCsv) throws Exception {
         //Apertura del fichero
-        System.out.println(carpetaActual + archivoCsv);
         File file = new File(carpetaActual + "/"+ archivoCsv);
         String fileName = archivoCsv.replace(".csv","");
 
@@ -53,7 +54,7 @@ public class Csv2Shape {
                 else
                     stringBuilder.append("").append(header).append(":String,");
             }
-            System.out.println(stringBuilder);
+            
             TYPE = DataUtilities.createType(fileName, stringBuilder.substring(0, stringBuilder.toString().length() - 1));
             GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 
@@ -79,6 +80,7 @@ public class Csv2Shape {
                 SimpleFeature feature = featureBuilder.buildFeature(null);
                 features.add(feature);
             }
+            logr.info("Successful convertion of CSV file from AYNI to SHP");
         } finally {
             reader.close();
         }

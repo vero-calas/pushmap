@@ -4,8 +4,10 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.logging.Logger;
 
 public class DownloadUtilies {
 
@@ -13,6 +15,7 @@ public class DownloadUtilies {
     private String[] zipFilesNames;
     private String carpetaActual;
     private String carpetaShapefiles;
+    private static final Logger logr = Logger.getLogger("PushMap");
 
     public DownloadUtilies(String[] urlList, String[] zipFilesNames) {
         this.urlList = urlList;
@@ -26,8 +29,8 @@ public class DownloadUtilies {
         File dir = new File(this.carpetaShapefiles);
         if (!dir.exists())
             if (!dir.mkdir())
-                System.out.println("Error al crear la carpeta shapefiles **"); // no se pudo crear la carpeta de destino
-        System.out.println("Se crea la carpeta con éxito");
+            	logr.warning("Error in creation of directory for shapefiles");
+        logr.info("Successful directory for shapefiles creation");
     }
 
     //Se descargan las capas con servicios WFS
@@ -55,7 +58,7 @@ public class DownloadUtilies {
                 out.close();
                 in.close();
             } catch (MalformedURLException e) {
-                System.out.println("la url: " + this.urlList[i] + " no es valida!");
+            	logr.warning("The URL '" + this.urlList[i] + "' is not valid.");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -65,24 +68,17 @@ public class DownloadUtilies {
     //Se descomprimen los archivos
     public void decompressZips(){
         String zipFileUbication;
-        File newFile;
         FileOutputStream fos;
-        File destDir;
         ZipInputStream zis;
-        ZipEntry zipEntry;
         FileInputStream fis;
         BufferedOutputStream dest;
-        int len;
-        System.out.println("estoy por aca");
         //Se descomprimen los archivos zip descargados
         for(int j = 0; j < this.zipFilesNames.length ; j++)
         {
 
             zipFileUbication = this.carpetaShapefiles + this.zipFilesNames[j];
-            System.out.println("ruta archivo: " + zipFileUbication);
-            System.out.println("carpetaShapefiles: " + this.carpetaShapefiles);
-
             try {
+            	logr.info("Decompressing zip files");
                 // Create a ZipInputStream to read the zip file
                 dest = null;
                 fis = new FileInputStream( zipFileUbication );
@@ -95,8 +91,6 @@ public class DownloadUtilies {
 
                 while( ( entry = zis.getNextEntry() ) != null ){
                     if( !entry.isDirectory() ){
-
-                        String entryName = entry.getName();
                         String destFN = this.carpetaShapefiles + File.separator + entry.getName();
 
                         // Write the file to the file system
@@ -111,9 +105,11 @@ public class DownloadUtilies {
                         dest.close();
                     }
                 }
+                logr.info("Successful decompress of zip files");
                 zis.close();
             }
             catch( Exception e ){
+            	logr.info("Error with decompress of zip files");
                 e.printStackTrace();
             }
         }

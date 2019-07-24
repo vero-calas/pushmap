@@ -19,10 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Shp2Pgsql {
 
     private DataStore dataStore;
+    private static final Logger logr = Logger.getLogger("PushMap");
 
     public void loadData(String carpetaShapefile, String nameFile){
         try {
@@ -49,34 +51,38 @@ public class Shp2Pgsql {
             FeatureCollection<SimpleFeatureType,SimpleFeature> data = readData(inputFeatureCollection);
 
             //Generación de la tabla y almacenar en la base de datos
+            
+            //Carga datos en base de datos
             writeData(data);
+            
             String datoStr = data.getSchema().getGeometryDescriptor().getType().toString();
             datoStr = datoStr.split(" ")[1];
             datoStr = datoStr.split("<")[0];
             datoStr = datoStr.toLowerCase();
-            System.out.println("datoStr: " + datoStr);
 
             //Publicacion en geoserver(?)
-            System.out.println("Publicación en geoserver...en proceso");
-
-
+            logr.info("Shapefile publication in process...");
             boolean ok = publishLayer(nameFile.replace(".shp", ""),GeoServerProperties.GEOSERVER_WS,GeoServerProperties.GEOSERVER_DS, datoStr);
-            if(ok)
-                System.out.println("PUBLICADO");
-            else
-                System.out.println("NO PUBLICADO");
-            
+            if(ok) {
+            	logr.info("Pulish success!");
+            }
+            else {
+            	logr.info("The layer is already published");
+            }
+            	
 
             //Finalizar conexión con base de datos
             this.dataStore.dispose();
             inputDataStore.dispose();
 
         } catch (IOException e) {
+        	logr.warning("Error with load data of: " + nameFile + " file");
             e.printStackTrace();
         }
     }
 
     public boolean publishLayer(String name, String workspace, String dataStore, String geomType){
+    	logr.info("The layer: " + name + ", is procesing for publish");
         boolean published = false;
 
         String restURL = GeoServerProperties.GEOSERVER_URL;
@@ -88,11 +94,9 @@ public class Shp2Pgsql {
             GeoServerRESTPublisher publisher = new GeoServerRESTPublisher(restURL,username,password);
 
             if(reader.existsLayer(workspace,name,true)){
-                System.out.println("Ya esta publicado!");
                 return published;
             }else{
-                System.out.println("NO está publicado");
-                System.out.println();
+            	logr.info("The layer is not published");
                 GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
                 fte.setName(name);
                 fte.setTitle(name);
@@ -101,7 +105,7 @@ public class Shp2Pgsql {
                 GSLayerEncoder layerEncoder = new GSLayerEncoder();
                 
                 if (geomType.equals("point")) {
-                    layerEncoder.setDefaultStyle("point");
+                	layerEncoder.setDefaultStyle("point");
                 } else if (geomType.equals("linestring")) {
                     layerEncoder.setDefaultStyle("line");
                 } else if (geomType.equals("multipolygon")) {
@@ -112,11 +116,12 @@ public class Shp2Pgsql {
                     layerEncoder.setDefaultStyle("point");
                 }
 
-                
+                logr.info("Publishing...");
                 published = publisher.publishDBLayer(workspace,dataStore,fte,layerEncoder);
                 return published;
             }
         }catch (MalformedURLException m){
+        	logr.warning("*Error with publish process*");
             m.printStackTrace();
             return published;
         }
@@ -141,6 +146,7 @@ public class Shp2Pgsql {
     }
 
     public void writeData(FeatureCollection<SimpleFeatureType, SimpleFeature> features){
+    	logr.info("Writing data in database initialized.");
         if(this.dataStore == null){
             throw new IllegalStateException("DataStore está vacía.");
         }
@@ -166,7 +172,7 @@ public class Shp2Pgsql {
             else {
                 dataStore.removeSchema(schema.getTypeName());
                 dataStore.createSchema(schema);
-                System.out.println("Ya esta creado pero se creo de nuevo");
+                logr.info("The data is already created, but will be created again.");
             }
 
             //Proceso de escritura de features
@@ -179,7 +185,7 @@ public class Shp2Pgsql {
                     //Se agregan todas las features a la base de datos
                     List<FeatureId> listaIDs = featureStore.addFeatures(features);
                     transaction.commit();
-                    System.out.println("Realiza la escritura en la base de datos");
+                    logr.info("The data is being writing in database.");
                 }catch(Exception ex){
                     //Si no se logra, se realiza un rollback
                     ex.printStackTrace();
@@ -188,11 +194,12 @@ public class Shp2Pgsql {
                     transaction.close();
                 }
             }else{
-                System.out.println("Error en la escritura en la base de datos");
+            	logr.warning("Error with the write of data in database.");
                 return;
             }
 
         }catch (IOException e){
+        	logr.warning("Error with the write of data in database.");
             e.printStackTrace();
         }
     }

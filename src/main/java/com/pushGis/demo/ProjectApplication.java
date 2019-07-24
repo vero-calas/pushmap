@@ -1,16 +1,9 @@
 package com.pushGis.demo;
 
+
 import model.DownloadUtilies;
 import model.Shp2Pgsql;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.logging.Logger;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 @SpringBootApplication
 @EnableScheduling
 public class ProjectApplication {
+	private static final Logger logr = Logger.getLogger("PushMap");
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(ProjectApplication.class, args);
@@ -35,7 +29,9 @@ public class ProjectApplication {
 
 			//--------------------------------------------------------------------------
             //Descarga de archivos por WFS
-			System.out.println("downloading wfs files");
+        	
+        	logr.info("Downloading WFS files");
+        	
 			String[] urlList = {"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_caletas_pesqueras_ddw84&maxFeatures=50&outputFormat=SHAPE-ZIP",
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_faenas_minerasactivas_ddw84&outputFormat=SHAPE-ZIP", 
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:mma_reservas_marinas_ddw84&outputFormat=SHAPE-ZIP", 
@@ -49,7 +45,7 @@ public class ProjectApplication {
 
 			//--------------------------------------------------------------------------
 			//Convertir de csv a shapefile
-			System.out.println("Converting csv to shp");
+			logr.info("Converting CSV file from AYNI to SHP");
 			Csv2Shape.createShape(downloadUtilies.getCarpetaActual(),downloadUtilies.getCarpetaShapefiles(),"voluntarios.csv");
 
             //--------------------------------------------------------------------------
@@ -59,6 +55,7 @@ public class ProjectApplication {
 			String carpetaShapefiles = downloadUtilies.getCarpetaShapefiles();
 			for(int j = 0; j < urlList.length ; j++)
 			{
+				logr.info("Load data of: " + servicesNames[j].replace(".zip",".shp") + " file");
 				shape2db.loadData(carpetaShapefiles, servicesNames[j].replace(".zip",".shp"));
 			}
 
