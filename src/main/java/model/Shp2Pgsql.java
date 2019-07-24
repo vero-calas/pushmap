@@ -24,11 +24,10 @@ public class Shp2Pgsql {
 
     private DataStore dataStore;
 
-    public void loadData(String url){
-
+    public void loadData(String carpetaShapefile, String nameFile){
         try {
             //Apertura del shapefile
-            File shp = new File(url);
+            File shp = new File(carpetaShapefile + nameFile);
             DataStore inputDataStore = DataStoreFinder.getDataStore(Collections.singletonMap("url",shp.toURI().toURL()));
             String fileName = inputDataStore.getTypeNames()[0];
             SimpleFeatureType inputType = inputDataStore.getSchema(fileName);
@@ -51,15 +50,20 @@ public class Shp2Pgsql {
 
             //Generación de la tabla y almacenar en la base de datos
             writeData(data);
+            String datoStr = data.getSchema().getGeometryDescriptor().getType().toString();
+            datoStr = datoStr.split(" ")[1];
+            datoStr = datoStr.split("<")[0];
+            datoStr = datoStr.toLowerCase();
+            System.out.println("datoStr: " + datoStr);
 
             //Publicacion en geoserver(?)
-            /*System.out.println("Publicación en geoserver...en proceso");
-            boolean ok = publishLayer("voluntarios","PushMap","pushmap");
+            System.out.println("Publicación en geoserver...en proceso");
+            boolean ok = publishLayer(nameFile.replace(".shp", ""),"pushMap","pushMap", datoStr);
             if(ok)
                 System.out.println("PUBLICADO");
             else
                 System.out.println("NO PUBLICADO");
-                */
+            
 
             //Finalizar conexión con base de datos
             this.dataStore.dispose();
@@ -70,8 +74,7 @@ public class Shp2Pgsql {
         }
     }
 
-    public boolean publishLayer(String name, String workspace, String dataStore){
-
+    public boolean publishLayer(String name, String workspace, String dataStore, String geomType){
         boolean published = false;
 
         String restURL = "http://localhost:8080/geoserver/";
@@ -94,8 +97,22 @@ public class Shp2Pgsql {
                 fte.setSRS("EPSG:4326");
 
                 GSLayerEncoder layerEncoder = new GSLayerEncoder();
-                layerEncoder.setDefaultStyle("point");
+                
+                if (geomType.equals("point")) {
+                    layerEncoder.setDefaultStyle("polygon");
+                } else if (geomType.equals("linestring")) {
+                    layerEncoder.setDefaultStyle("line");
+                } else if (geomType.equals("point")) {
+                    layerEncoder.setDefaultStyle("point");
+                } else if (geomType.equals("multipolygon")) {
+                    layerEncoder.setDefaultStyle("polygon");
+                } else if (geomType.equals("multilinestring")) {
+                    layerEncoder.setDefaultStyle("line");
+                } else if (geomType.equals("multipoint")) {
+                    layerEncoder.setDefaultStyle("point");
+                }
 
+                
                 published = publisher.publishDBLayer(workspace,dataStore,fte,layerEncoder);
                 return published;
             }

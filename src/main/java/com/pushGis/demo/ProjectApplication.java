@@ -54,19 +54,16 @@ public class ProjectApplication {
 
             //--------------------------------------------------------------------------
             //Subida de shapefiles a postgis
-			System.out.println("loading wfs layers");
+			//System.out.println("loading wfs layers");
 			Shp2Pgsql shape2db = new Shp2Pgsql();
-			String urlFinal;
+			String carpetaShapefiles = downloadUtilies.getCarpetaShapefiles();
 			for(int j = 0; j < urlList.length ; j++)
 			{
-				urlFinal =  downloadUtilies.getCarpetaShapefiles() + servicesNames[j].replace(".zip",".shp");
-				System.out.println(urlFinal);
-				shape2db.loadData(urlFinal);
+				shape2db.loadData(carpetaShapefiles, servicesNames[j].replace(".zip",".shp"));
 			}
 
-            System.out.println("loading data ayni");
-		    String carpetaShapefiles = downloadUtilies.getCarpetaShapefiles();
-			shape2db.loadData(carpetaShapefiles + "voluntarios.shp");
+            //System.out.println("loading data ayni");
+			shape2db.loadData(carpetaShapefiles, "voluntarios.shp");
 
 
         } catch (Exception e) {
