@@ -32,9 +32,6 @@ public class Csv2Shape {
 
     public static void createShape(String carpetaActual, String carpetaShapefiles, String archivoCsv) throws Exception {
         //Apertura del fichero
-    	//String carpetaActual = System.getProperty("user.dir");
-    	//carpetaActual = carpetaActual.replace("\\","/");
-        //String carpetaShapefiles = carpetaActual + "/shapefiles/";
         System.out.println(carpetaActual + archivoCsv);
         File file = new File(carpetaActual + "/"+ archivoCsv);
         String fileName = archivoCsv.replace(".csv","");

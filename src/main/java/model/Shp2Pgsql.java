@@ -58,7 +58,9 @@ public class Shp2Pgsql {
 
             //Publicacion en geoserver(?)
             System.out.println("Publicación en geoserver...en proceso");
-            boolean ok = publishLayer(nameFile.replace(".shp", ""),"pushMap","pushMap", datoStr);
+
+
+            boolean ok = publishLayer(nameFile.replace(".shp", ""),GeoServerProperties.GEOSERVER_WS,GeoServerProperties.GEOSERVER_DS, datoStr);
             if(ok)
                 System.out.println("PUBLICADO");
             else
@@ -77,9 +79,9 @@ public class Shp2Pgsql {
     public boolean publishLayer(String name, String workspace, String dataStore, String geomType){
         boolean published = false;
 
-        String restURL = "http://localhost:8080/geoserver/";
-        String username = "admin";
-        String password = "geoserver";
+        String restURL = GeoServerProperties.GEOSERVER_URL;
+        String username = GeoServerProperties.GEOSERVER_USER;
+        String password = GeoServerProperties.GEOSERVER_PASS;
 
         try{
             GeoServerRESTReader reader = new GeoServerRESTReader(restURL,username,password);
@@ -99,11 +101,9 @@ public class Shp2Pgsql {
                 GSLayerEncoder layerEncoder = new GSLayerEncoder();
                 
                 if (geomType.equals("point")) {
-                    layerEncoder.setDefaultStyle("polygon");
+                    layerEncoder.setDefaultStyle("point");
                 } else if (geomType.equals("linestring")) {
                     layerEncoder.setDefaultStyle("line");
-                } else if (geomType.equals("point")) {
-                    layerEncoder.setDefaultStyle("point");
                 } else if (geomType.equals("multipolygon")) {
                     layerEncoder.setDefaultStyle("polygon");
                 } else if (geomType.equals("multilinestring")) {

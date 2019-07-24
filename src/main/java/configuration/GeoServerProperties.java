@@ -23,4 +23,6 @@ public class GeoServerProperties {
     public final static String GEOSERVER_URL = properties.getProperty("geoserver.url");
     public final static String GEOSERVER_USER = properties.getProperty("geoserver.username");
     public final static String GEOSERVER_PASS = properties.getProperty("geoserver.password");
+    public final static String GEOSERVER_WS = properties.getProperty("geoserver.workspace");
+    public final static String GEOSERVER_DS = properties.getProperty("geoserver.datastore");
 }
