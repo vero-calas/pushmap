@@ -33,12 +33,9 @@ public class ProjectApplication {
 
         try {
 
-            //--------------------------------------------------------------------------
-            //Convertir de csv a shapefile
-            Csv2Shape.createShape();
-
 			//--------------------------------------------------------------------------
             //Descarga de archivos por WFS
+			System.out.println("downloading wfs files");
 			String[] urlList = {"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_caletas_pesqueras_ddw84&maxFeatures=50&outputFormat=SHAPE-ZIP",
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:gore_faenas_minerasactivas_ddw84&outputFormat=SHAPE-ZIP", 
 					"http://walker.dgf.uchile.cl/geoserver/chile/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=chile:mma_reservas_marinas_ddw84&outputFormat=SHAPE-ZIP", 
@@ -50,24 +47,26 @@ public class ProjectApplication {
 			downloadUtilies.downloadLayers();
 			downloadUtilies.decompressZips();
 
+			//--------------------------------------------------------------------------
+			//Convertir de csv a shapefile
+			System.out.println("Converting csv to shp");
+			Csv2Shape.createShape(downloadUtilies.getCarpetaActual(),downloadUtilies.getCarpetaShapefiles(),"voluntarios.csv");
+
             //--------------------------------------------------------------------------
-            //Subida de shapefile a postgis
-			/*Shp2Pgsql shape2db = new Shp2Pgsql();
-			String urlFinal;
-			for(int j = 0; i < urlList.length ; i++)
-			{
-				urlFinal = carpetaShapefiles + urlList[i];
-				System.out.println(urlFinal);
-				//shape2db.loadData(urlFinal);
-			}*/
-            System.out.println("loadData");
+            //Subida de shapefiles a postgis
+			System.out.println("loading wfs layers");
 			Shp2Pgsql shape2db = new Shp2Pgsql();
-			
-			String carpetaActual = System.getProperty("user.dir");
-	    	carpetaActual = carpetaActual.replace("\\","/");
-	        String carpetaShapefiles = carpetaActual + "/shapefiles/";
-	        
-			shape2db.loadData(carpetaShapefiles + "resultados.shp");
+			String urlFinal;
+			for(int j = 0; j < urlList.length ; j++)
+			{
+				urlFinal =  downloadUtilies.getCarpetaShapefiles() + servicesNames[j].replace(".zip",".shp");
+				System.out.println(urlFinal);
+				shape2db.loadData(urlFinal);
+			}
+
+            System.out.println("loading data ayni");
+		    String carpetaShapefiles = downloadUtilies.getCarpetaShapefiles();
+			shape2db.loadData(carpetaShapefiles + "voluntarios.shp");
 
 
         } catch (Exception e) {

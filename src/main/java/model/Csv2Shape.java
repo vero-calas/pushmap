@@ -30,13 +30,14 @@ import org.locationtech.jts.geom.Coordinate;
 
 public class Csv2Shape {
 
-    public static void createShape() throws Exception {
+    public static void createShape(String carpetaActual, String carpetaShapefiles, String archivoCsv) throws Exception {
         //Apertura del fichero
-    	String carpetaActual = System.getProperty("user.dir");
-    	carpetaActual = carpetaActual.replace("\\","/");
-        String carpetaShapefiles = carpetaActual + "/shapefiles/";
-        System.out.println(carpetaActual + "/voluntarios.csv");
-        File file = new File(carpetaActual + "/voluntarios.csv");
+    	//String carpetaActual = System.getProperty("user.dir");
+    	//carpetaActual = carpetaActual.replace("\\","/");
+        //String carpetaShapefiles = carpetaActual + "/shapefiles/";
+        System.out.println(carpetaActual + archivoCsv);
+        File file = new File(carpetaActual + "/"+ archivoCsv);
+        String fileName = archivoCsv.replace(".csv","");
 
         //Se crea un listado de features a partir de la lectura del archivo
         List<SimpleFeature> features = new ArrayList<>();
@@ -56,7 +57,7 @@ public class Csv2Shape {
                     stringBuilder.append("").append(header).append(":String,");
             }
             System.out.println(stringBuilder);
-            TYPE = DataUtilities.createType("resultados", stringBuilder.substring(0, stringBuilder.toString().length() - 1));
+            TYPE = DataUtilities.createType(fileName, stringBuilder.substring(0, stringBuilder.toString().length() - 1));
             GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 
             for (line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -84,7 +85,7 @@ public class Csv2Shape {
         } finally {
             reader.close();
         }
-        File newFile = new File(carpetaShapefiles + "resultados.shp");
+        File newFile = new File(carpetaShapefiles + fileName+".shp");
 
         DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 
